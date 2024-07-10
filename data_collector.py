@@ -1,4 +1,13 @@
-from langchain.document_loaders import WebBaseLoader
+import os
+import pickle
+from langchain_community.document_loaders import WebBaseLoader
+from langchain.schema import Document  # Corrected import path
+from dotenv import load_dotenv
+import requests
+
+load_dotenv()
+
+USER_AGENT = os.getenv("USER_AGENT")
 
 urls = [
     "https://www.apple.com/newsroom/",
@@ -42,10 +51,26 @@ urls = [
     "https://newsroom.okta.com/",
 ]
 
-loader = WebBaseLoader(urls)
-documents = loader.load()
+headers = {'User-Agent': USER_AGENT}
+session = requests.Session()
+session.headers.update(headers)
+
+def get_html(url):
+    try:
+        response = session.get(url, verify=False)
+        response.raise_for_status()
+        return response.text
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching {url}: {e}")
+        return None
+
+documents = []
+for url in urls:
+    html_content = get_html(url)
+    if html_content:
+        document = Document(page_content=html_content, metadata={"source": url})
+        documents.append(document)
 
 # Save documents to a file
-import pickle
 with open('documents.pkl', 'wb') as f:
     pickle.dump(documents, f)
