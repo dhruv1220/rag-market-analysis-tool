@@ -1,1 +1,16 @@
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore the .env file
+.env
+
+# Ignore virtual environment directory
 venv/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore macOS Finder files
+.DS_Store
